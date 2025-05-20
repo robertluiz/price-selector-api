@@ -1,0 +1,192 @@
+{
+    "info": {
+        "_postman_id": "f5d3f1f0-1101-4b8e-8c62-0f0f0f0f0f0f",
+        "name": "Price Selector API Tests",
+        "description": "A collection of requests to test the Price Selector API endpoints.",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "Test 1: 10:00 on Day 14",
+            "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "{{baseUrl}}/api/v1/prices/query?applicationDate=2020-06-14T10:00:00&productId=35455&brandId=1",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "api",
+                        "v1",
+                        "prices",
+                        "query"
+                    ],
+                    "query": [
+                        {
+                            "key": "applicationDate",
+                            "value": "2020-06-14T10:00:00"
+                        },
+                        {
+                            "key": "productId",
+                            "value": "35455"
+                        },
+                        {
+                            "key": "brandId",
+                            "value": "1"
+                        }
+                    ]
+                },
+                "description": "Test 1: petición a las 10:00 del día 14 del producto 35455 para la brand 1 (ZARA)"
+            },
+            "response": []
+        },
+        {
+            "name": "Test 2: 16:00 on Day 14",
+            "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "{{baseUrl}}/api/v1/prices/query?applicationDate=2020-06-14T16:00:00&productId=35455&brandId=1",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "api",
+                        "v1",
+                        "prices",
+                        "query"
+                    ],
+                    "query": [
+                        {
+                            "key": "applicationDate",
+                            "value": "2020-06-14T16:00:00"
+                        },
+                        {
+                            "key": "productId",
+                            "value": "35455"
+                        },
+                        {
+                            "key": "brandId",
+                            "value": "1"
+                        }
+                    ]
+                },
+                "description": "Test 2: petición a las 16:00 del día 14 del producto 35455 para la brand 1 (ZARA)"
+            },
+            "response": []
+        },
+        {
+            "name": "Test 3: 21:00 on Day 14",
+            "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "{{baseUrl}}/api/v1/prices/query?applicationDate=2020-06-14T21:00:00&productId=35455&brandId=1",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "api",
+                        "v1",
+                        "prices",
+                        "query"
+                    ],
+                    "query": [
+                        {
+                            "key": "applicationDate",
+                            "value": "2020-06-14T21:00:00"
+                        },
+                        {
+                            "key": "productId",
+                            "value": "35455"
+                        },
+                        {
+                            "key": "brandId",
+                            "value": "1"
+                        }
+                    ]
+                },
+                "description": "Test 3: petición a las 21:00 del día 14 del producto 35455 para la brand 1 (ZARA)"
+            },
+            "response": []
+        },
+        {
+            "name": "Test 4: 10:00 on Day 15",
+            "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "{{baseUrl}}/api/v1/prices/query?applicationDate=2020-06-15T10:00:00&productId=35455&brandId=1",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "api",
+                        "v1",
+                        "prices",
+                        "query"
+                    ],
+                    "query": [
+                        {
+                            "key": "applicationDate",
+                            "value": "2020-06-15T10:00:00"
+                        },
+                        {
+                            "key": "productId",
+                            "value": "35455"
+                        },
+                        {
+                            "key": "brandId",
+                            "value": "1"
+                        }
+                    ]
+                },
+                "description": "Test 4: petición a las 10:00 del día 15 del producto 35455 para la brand 1 (ZARA)"
+            },
+            "response": []
+        },
+        {
+            "name": "Test 5: 21:00 on Day 16",
+            "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "{{baseUrl}}/api/v1/prices/query?applicationDate=2020-06-16T21:00:00&productId=35455&brandId=1",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "api",
+                        "v1",
+                        "prices",
+                        "query"
+                    ],
+                    "query": [
+                        {
+                            "key": "applicationDate",
+                            "value": "2020-06-16T21:00:00"
+                        },
+                        {
+                            "key": "productId",
+                            "value": "35455"
+                        },
+                        {
+                            "key": "brandId",
+                            "value": "1"
+                        }
+                    ]
+                },
+                "description": "Test 5: petición a las 21:00 del día 16 del producto 35455 para la brand 1 (ZARA)"
+            },
+            "response": []
+        }
+    ],
+    "variable": [
+        {
+            "key": "baseUrl",
+            "value": "http://localhost:8080",
+            "type": "string"
+        }
+    ]
+} 
