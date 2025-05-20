@@ -1,5 +1,7 @@
 # Price Selector API
 
+[![Java CI with Maven](https://github.com/robertluiz/price-selector-api/actions/workflows/maven-ci.yml/badge.svg)](https://github.com/robertluiz/price-selector-api/actions/workflows/maven-ci.yml)
+
 ## Description
 
 This is a Spring Boot application that provides a REST API to query product prices for a given brand, product ID, and application date. It uses an in-memory H2 database initialized with sample data.
