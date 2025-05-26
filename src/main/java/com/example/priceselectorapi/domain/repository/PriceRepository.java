@@ -1,6 +1,7 @@
 package com.example.priceselectorapi.domain.repository;
 
 import com.example.priceselectorapi.domain.model.Price;
+import com.example.priceselectorapi.domain.port.PriceRepositoryPort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -9,7 +10,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
-public interface PriceRepository extends JpaRepository<Price, Long> {
+public interface PriceRepository extends JpaRepository<Price, Long>, PriceRepositoryPort {
 
     /**
      * Finds prices that match the given brandId, productId, and an applicationDate 

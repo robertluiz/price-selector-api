@@ -1,0 +1,81 @@
+services:
+  price-selector-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8081:8081"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - JAVA_OPTS=-Xmx512m -Xms256m
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8081/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+  performance-test:
+    build:
+      context: .
+      dockerfile: Dockerfile.performance
+    depends_on:
+      price-selector-api:
+        condition: service_healthy
+    environment:
+      - TARGET_HOST=price-selector-api:8081
+    profiles:
+      - performance
+
+  k6:
+    image: grafana/k6:latest
+    volumes:
+      - ./k6:/scripts
+    command: run /scripts/performance-test.js
+    environment:
+      - HOST=price-selector-api:8081
+    depends_on:
+      price-selector-api:
+        condition: service_healthy
+    profiles:
+      - k6
+
+  k6-with-monitoring:
+    image: grafana/k6:latest
+    volumes:
+      - ./k6:/scripts
+    command: ["run", "--out", "influxdb=http://influxdb:8086/k6", "/scripts/performance-test.js"]
+    environment:
+      - HOST=price-selector-api:8081
+    depends_on:
+      price-selector-api:
+        condition: service_healthy
+      influxdb:
+        condition: service_started
+    profiles:
+      - k6-monitoring
+
+  influxdb:
+    image: influxdb:1.8
+    environment:
+      - INFLUXDB_DB=k6
+      - INFLUXDB_USER=k6
+      - INFLUXDB_USER_PASSWORD=k6
+    ports:
+      - "8086:8086"
+    profiles:
+      - monitoring
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - ./grafana/dashboards:/var/lib/grafana/dashboards
+      - ./grafana/provisioning:/etc/grafana/provisioning
+    depends_on:
+      - influxdb
+    profiles:
+      - monitoring 
