@@ -24,7 +24,6 @@ public class CacheConfig {
     public CacheManager cacheManager() {
         CaffeineCacheManager cacheManager = new CaffeineCacheManager();
         cacheManager.setCaffeine(caffeineCacheBuilder());
-        cacheManager.setAsyncCacheMode(true);
         cacheManager.setCacheNames(java.util.Set.of("prices"));
         return cacheManager;
     }
