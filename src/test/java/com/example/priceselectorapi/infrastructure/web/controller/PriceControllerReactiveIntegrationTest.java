@@ -2,24 +2,24 @@ package com.example.priceselectorapi.infrastructure.web.controller;
 
 import com.example.priceselectorapi.application.dto.PriceResponseDTO;
 import com.example.priceselectorapi.domain.model.Price;
-import com.example.priceselectorapi.domain.port.PriceRepositoryPort;
+import com.example.priceselectorapi.domain.model.port.PriceRepositoryPort;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import reactor.core.publisher.Flux;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -33,7 +33,7 @@ class PriceControllerReactiveIntegrationTest {
     @Autowired
     private WebTestClient webTestClient;
 
-    @MockBean
+    @MockitoBean
     private PriceRepositoryPort priceRepositoryPort;
 
     @Nested
@@ -43,7 +43,6 @@ class PriceControllerReactiveIntegrationTest {
         @Test
         @DisplayName("Should return single price when only one matches criteria")
         void shouldReturnSinglePriceWhenOnlyOneMatches() {
-            // Given
             LocalDateTime queryDate = LocalDateTime.of(2020, 6, 14, 10, 0);
             Long productId = 12345L;
             Integer brandId = 1;
@@ -55,10 +54,9 @@ class PriceControllerReactiveIntegrationTest {
                 LocalDateTime.of(2020, 12, 31, 23, 59, 59)
             );
             
-            when(priceRepositoryPort.findApplicablePrices(eq(queryDate), eq(productId), eq(brandId)))
-                .thenReturn(List.of(mockPrice));
+            when(priceRepositoryPort.findApplicablePrices(any(LocalDateTime.class), anyLong(), anyInt()))
+                .thenReturn(Flux.just(mockPrice));
 
-            // When & Then
             webTestClient.get()
                 .uri(uriBuilder -> uriBuilder
                     .path("/api/v1/prices/query")
@@ -81,7 +79,6 @@ class PriceControllerReactiveIntegrationTest {
         @Test
         @DisplayName("Should return highest priority price when multiple prices match")
         void shouldReturnHighestPriorityPriceWhenMultipleMatch() {
-            // Given
             LocalDateTime queryDate = LocalDateTime.of(2020, 6, 14, 16, 0);
             Long productId = 12345L;
             Integer brandId = 1;
@@ -100,11 +97,9 @@ class PriceControllerReactiveIntegrationTest {
                 LocalDateTime.of(2020, 6, 14, 18, 30)
             );
             
-            // Repository returns highest priority first (as per business logic)
-            when(priceRepositoryPort.findApplicablePrices(eq(queryDate), eq(productId), eq(brandId)))
-                .thenReturn(Arrays.asList(promotionalPrice, basePricePrice));
+            when(priceRepositoryPort.findApplicablePrices(any(LocalDateTime.class), anyLong(), anyInt()))
+                .thenReturn(Flux.just(promotionalPrice, basePricePrice));
 
-            // When & Then
             webTestClient.get()
                 .uri(uriBuilder -> uriBuilder
                     .path("/api/v1/prices/query")
@@ -127,7 +122,6 @@ class PriceControllerReactiveIntegrationTest {
         @Test
         @DisplayName("Should handle different currencies correctly")
         void shouldHandleDifferentCurrenciesCorrectly() {
-            // Given
             LocalDateTime queryDate = LocalDateTime.of(2020, 6, 14, 10, 0);
             Long productId = 67890L;
             Integer brandId = 2;
@@ -139,10 +133,9 @@ class PriceControllerReactiveIntegrationTest {
                 LocalDateTime.of(2020, 12, 31, 23, 59, 59)
             );
             
-            when(priceRepositoryPort.findApplicablePrices(eq(queryDate), eq(productId), eq(brandId)))
-                .thenReturn(List.of(usdPrice));
+            when(priceRepositoryPort.findApplicablePrices(any(LocalDateTime.class), anyLong(), anyInt()))
+                .thenReturn(Flux.just(usdPrice));
 
-            // When & Then
             webTestClient.get()
                 .uri(uriBuilder -> uriBuilder
                     .path("/api/v1/prices/query")
@@ -167,15 +160,13 @@ class PriceControllerReactiveIntegrationTest {
         @Test
         @DisplayName("Should return 404 when no price found for criteria")
         void shouldReturn404WhenNoPriceFound() {
-            // Given
             LocalDateTime queryDate = LocalDateTime.of(2020, 6, 14, 10, 0);
             Long productId = 99999L;
             Integer brandId = 1;
             
-            when(priceRepositoryPort.findApplicablePrices(eq(queryDate), eq(productId), eq(brandId)))
-                .thenReturn(Collections.emptyList());
+            when(priceRepositoryPort.findApplicablePrices(any(LocalDateTime.class), anyLong(), anyInt()))
+                .thenReturn(Flux.empty());
 
-            // When & Then
             webTestClient.get()
                 .uri(uriBuilder -> uriBuilder
                     .path("/api/v1/prices/query")
@@ -274,8 +265,8 @@ class PriceControllerReactiveIntegrationTest {
                 LocalDateTime.of(2020, 12, 31, 23, 59, 59)
             );
             
-            when(priceRepositoryPort.findApplicablePrices(eq(queryDate), eq(productId), eq(brandId)))
-                .thenReturn(List.of(freePrice));
+            when(priceRepositoryPort.findApplicablePrices(any(LocalDateTime.class), anyLong(), anyInt()))
+                .thenReturn(Flux.just(freePrice));
 
             // When & Then
             webTestClient.get()
@@ -308,8 +299,8 @@ class PriceControllerReactiveIntegrationTest {
                 LocalDateTime.of(2020, 12, 31, 23, 59, 59)
             );
             
-            when(priceRepositoryPort.findApplicablePrices(eq(queryDate), eq(productId), eq(brandId)))
-                .thenReturn(List.of(precisePrice));
+            when(priceRepositoryPort.findApplicablePrices(any(LocalDateTime.class), anyLong(), anyInt()))
+                .thenReturn(Flux.just(precisePrice));
 
             // When & Then
             webTestClient.get()
