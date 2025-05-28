@@ -1,16 +1,15 @@
 package com.example.priceselectorapi.application.service;
 
+import com.example.priceselectorapi.application.cache.CacheKeyGenerator;
+import com.example.priceselectorapi.application.cache.CacheStrategy;
 import com.example.priceselectorapi.domain.model.Price;
-import com.example.priceselectorapi.domain.port.PriceQueryPort;
-import com.example.priceselectorapi.domain.port.PriceRepositoryPort;
+import com.example.priceselectorapi.domain.model.port.PriceQueryPort;
+import com.example.priceselectorapi.domain.model.port.PriceRepositoryPort;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
 
 import java.time.LocalDateTime;
 
@@ -20,6 +19,8 @@ import java.time.LocalDateTime;
 public class PriceQueryService implements PriceQueryPort {
 
     private final PriceRepositoryPort priceRepositoryPort;
+    private final CacheStrategy<Object> cacheStrategy;
+    private final CacheKeyGenerator cacheKeyGenerator;
 
     /**
      * Finds the applicable price for a given product, brand, and application date.
@@ -31,27 +32,28 @@ public class PriceQueryService implements PriceQueryPort {
      * @param brandId The ID of the brand.
      * @return A Mono containing the applicable Price if found, otherwise an empty Mono.
      */
-    @Cacheable(value = "prices", key = "#applicationDate.toString() + '_' + #productId + '_' + #brandId")
+    @Override
     public Mono<Price> findApplicablePrice(
             LocalDateTime applicationDate,
             Long productId,
             Integer brandId) {
 
-        return Mono.fromCallable(() -> {
-                    log.debug("Searching for applicable prices for productId: {}, brandId: {}, date: {}", 
-                        productId, brandId, applicationDate);
-                    
-                    return priceRepositoryPort.findApplicablePrices(applicationDate, productId, brandId);
-                })
-                .subscribeOn(Schedulers.boundedElastic())
-                .flatMapMany(Flux::fromIterable)
+        log.debug("Searching for applicable prices for productId: {}, brandId: {}, date: {}", 
+                productId, brandId, applicationDate);
+
+        String cacheKey = cacheKeyGenerator.generateKey(applicationDate, productId, brandId);
+        
+        return cacheStrategy.get(cacheKey, () -> 
+            priceRepositoryPort.findApplicablePrices(applicationDate, productId, brandId)
                 .doOnNext(price -> log.debug("Found applicable price with priority: {} and amount: {}", 
                     price.getPriority(), price.getPriceAmount()))
                 .next()
-                .doOnSuccess(price -> {
-                    if (price == null) {
-                        log.debug("No applicable price found");
-                    }
-                });
+                .cast(Object.class)
+        ).cast(Price.class)
+        .doOnSuccess(price -> {
+            if (price == null) {
+                log.debug("No applicable price found");
+            }
+        });
     }
 } 
